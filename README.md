@@ -1,1 +1,20 @@
-# API_Meteorolog-a_Carga_AWSRedshift
+# API Meteorología con carga de datos a AWS Redshift
+
+### Proyecto que consiste en la creación de un script que extrae datos de una API pública con posterior creación y carga de datos en una tabla AWS Redshift.
+
+Consideraciones:
+- Para poder hacer la conexión entre Python y AWS Redshift se utilizó  SQLAlchemy.  Es una herramienta que puede ser utilizada de diferentes formas, en este caso como conexión directa entre Python y SQL en un DataWarehouse como AWS Redshift.
+Se utilizó el método anterior debido a su practicidad y simplicidad en la carga de datos a la nube.
+
+- [Script principal](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/main_script.py "Script principal")
+
+- [Clases y funciones utilizadas](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/paquetes/utils.py "Clases y funciones utilizadas")
+- [Librerías utilizadas](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/requirements.txt "Librerías utilizadas")
+
+- [Variables](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/variables.png "Variables")
+
+##### API utilizada: [Openweathermap](https://openweathermap.org/ "Openweathermap")
+##### Documentación: https://openweathermap.org/forecast5
+
+[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/openweathermap.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/openweathermap.png)
+
