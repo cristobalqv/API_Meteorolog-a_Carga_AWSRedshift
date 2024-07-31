@@ -3,7 +3,7 @@ import psycopg2
 import json
 import pandas as pd
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from datetime import datetime
 
 
@@ -48,18 +48,18 @@ class ConexionAPIDescargaJSON():
         if self.response_json is not None:
             for elemento in self.response_json['list']:
                 try:
-                    diccionario['fecha'].append(datetime.strptime(elemento['dt_txt'], "%Y-%m-%d %H:%M:%S").date())
-                    diccionario['hora'].append(datetime.strptime(elemento['dt_txt'], "%Y-%m-%d %H:%M:%S").time())
-                    diccionario['temperatura'].append(round(float(elemento['main']['temp']) -273.15, 1))
-                    diccionario['t_sensacion_termica'].append(round(float(elemento['main']['feels_like']) -273.15, 1))
-                    diccionario['t_minima'].append(round(float(elemento['main']['temp_min']) -273.15, 1))
-                    diccionario['t_maxima'].append(round(float(elemento['main']['temp_max']) -273.15, 1))
+                    diccionario['fecha'].append(elemento['dt_txt'])
+                    diccionario['hora'].append(elemento['dt_txt'])
+                    diccionario['temperatura'].append(elemento['main']['temp'])
+                    diccionario['t_sensacion_termica'].append(elemento['main']['feels_like'])
+                    diccionario['t_minima'].append(elemento['main']['temp_min'])
+                    diccionario['t_maxima'].append(elemento['main']['temp_max'])
                     diccionario['condicion'].append(elemento['weather'][0]['main'])
                     diccionario['descripcion'].append(elemento['weather'][0]['description'])
-                    diccionario['veloc_viento'].append(round(float(elemento['wind']['speed']) *3.6))
-                    diccionario['%_humedad'].append(float(elemento['main']['humidity']))
-                    diccionario['probabilidad_precip'].append(elemento['pop'] *100)
-                    diccionario['precip_ultimas_3h(mm)'].append(float(elemento.get('rain', {}).get('3h', 0)))   #como ciertos diccionarios no tienen la clave "rain" (casos en que no llueve), se maneja de esta forma.
+                    diccionario['veloc_viento'].append(elemento['wind']['speed'])
+                    diccionario['%_humedad'].append(elemento['main']['humidity'])
+                    diccionario['probabilidad_precip'].append(elemento['pop'])
+                    diccionario['precip_ultimas_3h(mm)'].append(elemento.get('rain', {}).get('3h', 0))  #como ciertos diccionarios no tienen la clave "rain" (casos en que no llueve), se maneja de esta forma.
                 except Exception as e:
                     print(f'Ocurrió un error al consolidar datos al diccionario: {e}')
             print('Carga de datos al diccionario exitosa')
@@ -73,6 +73,28 @@ class ConexionAPIDescargaJSON():
             return self.df
         else:
             raise ValueError("No hay archivo JSON para procesar aún")
+    
+
+
+    def procesar_dataframe(self):
+        if self.df is not None:
+            try:
+                self.df['fecha'] = self.df['fecha'].apply(lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S").date())
+                self.df['hora'] = self.df['hora'].apply(lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S").time())
+                self.df['temperatura'] = self.df['temperatura'].apply(lambda x: round(float(x)-273.15, 1)) 
+                self.df['t_sensacion_termica'] = self.df['t_sensacion_termica'].apply(lambda x: round(float(x)-273.15, 1))
+                self.df['t_minima'] = self.df['t_minima'].apply(lambda x: round(float(x)-273.15, 1))
+                self.df['t_maxima'] = self.df['t_maxima'].apply(lambda x: round(float(x)-273.15, 1))
+                self.df['veloc_viento'] = self.df['veloc_viento'].apply(lambda x: round(float(x)*3.6)) 
+                self.df['probabilidad_precip'] = self.df['probabilidad_precip'].apply(lambda x: x*100)
+                self.df['precip_ultimas_3h(mm)'] =  self.df['precip_ultimas_3h(mm)'].apply(lambda x: float(x))
+            except Exception as e:
+                print(f'Ocurrió un error al procesar el dataframe: {e}')
+
+            return self.df       #es necesario retornar el df completo nuevamente ya que trabajaremos con él fuera de la clase
+        else:
+            print('No hay dataframe para procesar')
+            return self.df
 
     
 
@@ -118,11 +140,34 @@ class RedshiftManager():
         if self.conexion is not None:
             try: 
                 tabla = dataframe.to_sql(nombretabla, con=self.conexion, schema=self.schema, if_exists='replace', index=False)
+                
+                #agregar 2 columnas temporales con fecha y hora de carga
+                self.crear_columnas_temporales(nombretabla)
+
                 print(f'Dataframe cargado con éxito en AWS Redshift')
             except Exception as e:
                 print(f'Error al cargar dataframe a AWS Redshift: {e}')
         else:
             print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión")
+
+    
+
+    #Crear columnas temporales
+    def crear_columnas_temporales(self, nombretabla):
+        if self.conexion is not None:
+            try:
+                #columna temporal para fecha
+                alter_table_date_query = f'''ALTER TABLE {nombretabla} ADD COLUMN fecha_carga DATE DEFAULT CURRENT_DATE;'''
+                self.conexion.execute(text(alter_table_date_query))
+
+                #columna temporal para hora
+                alter_table_time_query = f"""ALTER TABLE {nombretabla} ADD COLUMN hora_carga VARCHAR(8) DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS');"""
+                self.conexion.execute(text(alter_table_time_query))
+
+            except Exception as e:
+                print(f'Error al añadir columnas temporales: {e}')
+        else:
+            print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión") 
 
 
 
