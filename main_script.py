@@ -20,9 +20,10 @@ url_base = f'https://api.openweathermap.org/data/2.5/forecast?lat=-33.437&lon=-7
 
 
 #EJECUCIÓN
-conexion1 = ConexionAPIDescargaJSON(url_base)
-conexion1.conectar_API_devolver_json()
-df = conexion1.convertir_json_a_dataframe()
+conexion = ConexionAPIDescargaJSON(url_base)
+conexion.conectar_API_devolver_json()    #archivo sin parsear de la respuesta del servidor que se guarda en el objeto conexion.response_json
+conexion.convertir_json_a_dataframe()    #retornará self.df que será guardado en el atributo conexion.df
+df = conexion.procesar_dataframe()            
 
 redshift = RedshiftManager(credenciales_redshift, schema)
 redshift.crear_motor_conexion_redshift()
