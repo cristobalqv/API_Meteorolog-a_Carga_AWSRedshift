@@ -4,7 +4,9 @@
 
 
 ### Los datos recopilados corresponden al pronóstico meteorológico para la ciudad de Santiago de Chile. Esta información fue extraída para los siguientes 5 días a contar de la fecha actual, con un intervalo de tiempo de 3 horas entre cada registro.
+
 [https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/santiago.png](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/santiago.png)
+
 
 Consideraciones:
 - Para poder hacer la conexión entre Python y AWS Redshift se utilizó  SQLAlchemy.  Es una herramienta que puede ser utilizada de diferentes formas, en este caso como conexión directa entre Python y SQL en un DataWarehouse como AWS Redshift.
