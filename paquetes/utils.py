@@ -30,7 +30,6 @@ class ConexionAPIDescargaJSON():
 
 
     #Recibe un archivo JSON devuelto por la API y lo convierte en un dataframe de pandas.
-    #La transformación de ciertos metadatos a un formato específico ocurre en la misma iteración y agregación a las claves(columnas) del diccionario. De esta forma se pueden transformar posteriormente los datos, pero en menor medida
     def convertir_json_a_dataframe(self):
         diccionario = {'fecha': [], 
                         'hora': [],
