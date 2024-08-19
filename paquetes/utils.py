@@ -134,14 +134,23 @@ class RedshiftManager():
 
 
 
-    #SEGUNDA ENTREGA: Crear lista de claves primaria compuesta que involucre fecha y hora. Al no tener una clave primaria que identifique a un registro como único, generamos una clave primaria compuesta entre fecha y hora. Esto nos da 2 ventajas: identificar cada registro dentro del dataframe como único, y también nos da una guía para actualizar ciertos registros que podrían duplicarse. De esta forma, al actualizar nuestra tabla con nuevos registros que posiblemente sean duplicados en fecha y hora, primero se van a eliminar los registros que corresponden a la misma fecha y hora, pero que fueron extraídos en primera instancia. Así se pueden reemplazar adecuadamente los registros que presentan la misma fecha y hora al ejecutar el script.
+    #SEGUNDA ENTREGA: Crear lista de claves primaria compuesta que involucre fecha y hora. Al no tener una clave primaria que 
+    # identifique a un registro como único, generamos una clave primaria compuesta entre fecha y hora. Esto nos da 2 ventajas: 
+    # identificar cada registro dentro del dataframe como único, y también nos da una guía para actualizar ciertos registros 
+    # que podrían duplicarse. De esta forma, al actualizar nuestra tabla con nuevos registros que posiblemente sean duplicados 
+    # en fecha y hora, primero se van a eliminar los registros que corresponden a la misma fecha y hora, pero que fueron 
+    # extraídos en primera instancia. Así se pueden reemplazar adecuadamente los registros que presentan la misma fecha y 
+    # hora al ejecutar el script.
 
     def actualizar_fechas_horas(self, dataframe, nombretabla):
         if self.conexion is not None:
             try:
-                fechas_horas = dataframe[['fecha', 'hora']].values.tolist()  #Esto va a generar una lista de listas a partir del dataframe que quiero insertar, y que contendrá la fecha y hora de los registros nuevos
+                fechas_horas = dataframe[['fecha', 'hora']].values.tolist()  #Esto va a generar una lista de listas a partir 
+                # del dataframe que quiero insertar, y que contendrá la fecha y hora de los registros nuevos
                 for fecha, hora in fechas_horas:
-                    query_eliminar = f'''DELETE FROM {nombretabla} WHERE fecha = '{fecha}' AND hora = '{hora}';'''     #elimina cada registro de hora y fecha  creado antes del dataframe actual, para que pueda ser actualizado por los registros coincidentes del nuevo dataframe
+                    query_eliminar = f'''DELETE FROM {nombretabla} WHERE fecha = '{fecha}' AND hora = '{hora}';'''     #elimina 
+                    # cada registro de hora y fecha  creado antes del dataframe actual, para que pueda ser actualizado 
+                    # por los registros coincidentes del nuevo dataframe
                     self.conexion.execute(text(query_eliminar))
                 print('Se actualizó correctamente la información')
             except Exception as e:
@@ -166,8 +175,16 @@ class RedshiftManager():
 
     
 
-    # SEGUNDA ENTREGA: como la función de prueba anterior (borrada) me genera este error: "ALTER COLUMN SET NOT NULL is not supported" al tratar de generar una llave compuesta, voy a crear 2 columnas nuevas que tengan restriccion not null desde el inicio, copiar los datos desde las columnas fecha y hora antiguas a las nuevas y eliminar las columnas antiguas. Esto trae un inconveniente en como se distribuye y observa la tabla finalmente, ya que estas columnas son creadas por defecto al final de la tabla. 
-    # Postgresql no tiene una opción para cambiar el orden en que se muestran las columnas en la tabla, por lo que para poder corregir la disposición de las columnas fecha y hora es necesario crear una nueva tabla con las columnas en el orden deseado, copiar los datos de la tabla original a la nueva, eliminar la tabla original si es necesario y renombrar la nueva tabla. Se opta por no modificar el nuevo orden de la tabla, con las columnas de pronóstico fecha y hora en el sector derecho de la tabla.    
+    # SEGUNDA ENTREGA: como la función de prueba anterior (borrada) me genera este error: "ALTER COLUMN SET NOT NULL is 
+    # not supported" al tratar de generar una llave compuesta, voy a crear 2 columnas nuevas que tengan restriccion not null 
+    # desde el inicio, copiar los datos desde las columnas fecha y hora antiguas a las nuevas y eliminar las columnas antiguas. 
+    # Esto trae un inconveniente en como se distribuye y observa la tabla finalmente, ya que estas columnas son creadas 
+    # por defecto al final de la tabla. 
+    # Postgresql no tiene una opción para cambiar el orden en que se muestran las columnas en la tabla, por lo que para 
+    # poder corregir la disposición de las columnas fecha y hora es necesario crear una nueva tabla con las columnas en 
+    # el orden deseado, copiar los datos de la tabla original a la nueva, eliminar la tabla original si es necesario y 
+    # renombrar la nueva tabla. Se opta por no modificar el nuevo orden de la tabla, con las columnas de pronóstico fecha 
+    # y hora en el sector derecho de la tabla.    
 
     def modificar_columnas_crear_llave_compuesta(self, nombretabla):    #YA QUE REDSHIFT NO PERMITE MODIFICAR COLUMNAS A NOT NULL SI YA ESTAN CREADAS
         if self.conexion is not None:
