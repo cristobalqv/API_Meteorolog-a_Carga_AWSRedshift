@@ -58,7 +58,8 @@ class ConexionAPIDescargaJSON():
                     diccionario['veloc_viento'].append(elemento['wind']['speed'])
                     diccionario['%_humedad'].append(elemento['main']['humidity'])
                     diccionario['probabilidad_precip'].append(elemento['pop'])
-                    diccionario['precip_ultimas_3h(mm)'].append(elemento.get('rain', {}).get('3h', 0))  #como ciertos diccionarios no tienen la clave "rain" (casos en que no llueve), se maneja de esta forma.
+                    diccionario['precip_ultimas_3h(mm)'].append(elemento.get('rain', {}).get('3h', 0))  #como ciertos diccionarios 
+                                                    # no tienen la clave "rain" (casos en que no llueve), se maneja de esta forma.
                 except Exception as e:
                     print(f'Ocurrió un error al consolidar datos al diccionario: {e}')
             print('Carga de datos al diccionario exitosa')
@@ -186,7 +187,8 @@ class RedshiftManager():
     # renombrar la nueva tabla. Se opta por no modificar el nuevo orden de la tabla, con las columnas de pronóstico fecha 
     # y hora en el sector derecho de la tabla.    
 
-    def modificar_columnas_crear_llave_compuesta(self, nombretabla):    #YA QUE REDSHIFT NO PERMITE MODIFICAR COLUMNAS A NOT NULL SI YA ESTAN CREADAS
+    def modificar_columnas_crear_llave_compuesta(self, nombretabla):    #YA QUE REDSHIFT NO PERMITE MODIFICAR COLUMNAS 
+                                                                        # A NOT NULL SI YA ESTAN CREADAS
         if self.conexion is not None:
             try:
                 #crear nuevas columnas con not null
@@ -243,7 +245,8 @@ class RedshiftManager():
                 resultado2 = self.conexion.execute(text(chequear_columna_hora_carga)).fetchone()
                 if not resultado2:
                     #columna temporal para hora
-                    alter_table_time_query = f"""ALTER TABLE {nombretabla} ADD COLUMN hora_carga VARCHAR(8) DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS')    NOT NULL;"""
+                    alter_table_time_query = f"""ALTER TABLE {nombretabla} ADD COLUMN hora_carga VARCHAR(8) 
+                                                DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS')    NOT NULL;"""
                     self.conexion.execute(text(alter_table_time_query))
                     print('columna hora_carga añadida')
                 else:
