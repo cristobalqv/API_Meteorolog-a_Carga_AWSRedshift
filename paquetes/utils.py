@@ -196,21 +196,21 @@ class RedshiftManager():
                 self.conexion.execute(text(f"ALTER TABLE {nombretabla} ADD COLUMN hora_nueva TIME NOT NULL DEFAULT CURRENT_TIME;"))
                 print("columnas 'fecha_nueva' y 'hora_nueva' añadidas")
 
-                # 2. Copiar los datos desde las columnas originales
+                #copiar los datos desde las columnas originales
                 self.conexion.execute(text(f"UPDATE {nombretabla} SET fecha_nueva = fecha, hora_nueva = hora;"))
                 print("Datos copiados a las nuevas columnas")
 
-                # 3. Eliminar las columnas originales
+                #eliminar las columnas originales
                 self.conexion.execute(text(f"ALTER TABLE {nombretabla} DROP COLUMN fecha;"))
                 self.conexion.execute(text(f"ALTER TABLE {nombretabla} DROP COLUMN hora;"))
                 print("Columnas originales 'fecha' y 'hora' eliminadas")
 
-                # 4. Renombrar las nuevas columnas
+                #renombrar las nuevas columnas
                 self.conexion.execute(text(f"ALTER TABLE {nombretabla} RENAME COLUMN fecha_nueva TO fecha;"))
                 self.conexion.execute(text(f"ALTER TABLE {nombretabla} RENAME COLUMN hora_nueva TO hora;"))
                 print("Nuevas columnas renombradas a 'fecha' y 'hora'")
 
-                 # 5. Crear la clave primaria compuesta
+                 #crear la clave primaria compuesta
                 clave_primaria_query = f'''ALTER TABLE {nombretabla} ADD CONSTRAINT pk_fecha_hora PRIMARY KEY (fecha, hora);'''
                 self.conexion.execute(text(clave_primaria_query))
                 print(f"Clave primaria compuesta creada en la tabla {nombretabla}")
