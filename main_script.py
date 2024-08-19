@@ -27,6 +27,8 @@ df = conexion.procesar_dataframe()
 
 redshift = RedshiftManager(credenciales_redshift, schema)
 redshift.crear_motor_conexion_redshift()
+redshift.actualizar_fechas_horas(df, 'meteorología_santiago_cl')
 redshift.cargar_datos_redshift(df, 'meteorología_santiago_cl')
-redshift.cerrar_conexion_redshift
+# redshift.modificar_columnas_crear_llave_compuesta('meteorología_santiago_cl')  #Esta parte del codigo la omitimos porque ya la llamamos, modificamos y creamos
+redshift.cerrar_conexion_redshift()
 
