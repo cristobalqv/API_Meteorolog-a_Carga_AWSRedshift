@@ -5,7 +5,7 @@
 
 ### Los datos recopilados corresponden al pronóstico meteorológico para la ciudad de Santiago de Chile. Esta información fue extraída para los siguientes 5 días a contar de la fecha actual, con un intervalo de tiempo de 3 horas entre cada registro.
 
-[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/santiago.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/santiago.png)
+[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)
 
 
 Consideraciones:
@@ -24,5 +24,6 @@ Se utilizó el método anterior debido a su practicidad y simplicidad en la carg
 ##### API utilizada: [Openweathermap](https://openweathermap.org/ "Openweathermap")
 ##### Documentación: https://openweathermap.org/forecast5
 
-[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/openweathermap.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/openweathermap.png)
+[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/openweathermap.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/openweathermap.png)
+
 
