@@ -14,10 +14,10 @@ Se utilizó el método anterior debido a su practicidad y simplicidad en la carg
 
 - Coordenadas: lat=-33.437   lon=-70.650
 
-- [Script principal](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/main_script.py "Script principal")
+- [Script principal](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/script/main_script.py "Script principal")
 
-- [Clases y funciones utilizadas](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/paquetes/utils.py "Clases y funciones utilizadas")
-- [Librerías utilizadas](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/requirements.txt "Librerías utilizadas")
+- [Clases y funciones utilizadas](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/modulos/utils.py "Clases y funciones utilizadas")
+- [Librerías utilizadas](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/modulos/requirements.txt "Librerías utilizadas")
 
 - [Variables](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/variables.png "Variables")
 
