@@ -1,0 +1,29 @@
+[2024-09-01T22:41:35.543+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2024-09-01T22:41:35.614+0000] {taskinstance.py:2603} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_meterorologia.ejecutar_etl scheduled__2024-08-31T00:00:00+00:00 [queued]>
+[2024-09-01T22:41:35.636+0000] {taskinstance.py:2603} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_meterorologia.ejecutar_etl scheduled__2024-08-31T00:00:00+00:00 [queued]>
+[2024-09-01T22:41:35.638+0000] {taskinstance.py:2856} INFO - Starting attempt 1 of 6
+[2024-09-01T22:41:35.673+0000] {taskinstance.py:2879} INFO - Executing <Task(PythonOperator): ejecutar_etl> on 2024-08-31 00:00:00+00:00
+[2024-09-01T22:41:35.683+0000] {warnings.py:112} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:70: DeprecationWarning: This process (pid=151) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  pid = os.fork()
+
+[2024-09-01T22:41:35.688+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'etl_meterorologia', 'ejecutar_etl', 'scheduled__2024-08-31T00:00:00+00:00', '--job-id', '3', '--raw', '--subdir', 'DAGS_FOLDER/dag.py', '--cfg-path', '/tmp/tmps0s_gy2z']
+[2024-09-01T22:41:35.693+0000] {standard_task_runner.py:72} INFO - Started process 152 to run task
+[2024-09-01T22:41:35.693+0000] {standard_task_runner.py:105} INFO - Job 3: Subtask ejecutar_etl
+[2024-09-01T22:41:35.769+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_meterorologia.ejecutar_etl scheduled__2024-08-31T00:00:00+00:00 [running]> on host 4f35a2349860
+[2024-09-01T22:41:35.916+0000] {taskinstance.py:3122} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='cristobalqv' AIRFLOW_CTX_DAG_ID='etl_meterorologia' AIRFLOW_CTX_TASK_ID='ejecutar_etl' AIRFLOW_CTX_EXECUTION_DATE='2024-08-31T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-08-31T00:00:00+00:00'
+[2024-09-01T22:41:35.920+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2024-09-01T22:41:44.794+0000] {logging_mixin.py:190} INFO - Conexión exitosa a la API. Archivo JSON listo para ser procesado
+[2024-09-01T22:41:44.797+0000] {logging_mixin.py:190} INFO - Carga de datos al diccionario exitosa
+[2024-09-01T22:41:44.847+0000] {logging_mixin.py:190} INFO - Motor creado exitosamente
+[2024-09-01T22:41:47.336+0000] {logging_mixin.py:190} INFO - Conectado a AWS Redshift con éxito
+[2024-09-01T22:42:07.548+0000] {logging_mixin.py:190} INFO - Se actualizó correctamente la información
+[2024-09-01T22:42:15.434+0000] {logging_mixin.py:190} INFO - columna fecha_carga ya existe
+[2024-09-01T22:42:15.792+0000] {logging_mixin.py:190} INFO - columna hora_carga ya existe
+[2024-09-01T22:42:15.794+0000] {logging_mixin.py:190} INFO - Dataframe cargado con éxito en AWS Redshift
+[2024-09-01T22:42:15.934+0000] {logging_mixin.py:190} INFO - Conexión cerrada.
+[2024-09-01T22:42:15.941+0000] {python.py:240} INFO - Done. Returned value was: None
+[2024-09-01T22:42:15.993+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2024-09-01T22:42:15.995+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=etl_meterorologia, task_id=ejecutar_etl, run_id=scheduled__2024-08-31T00:00:00+00:00, execution_date=20240831T000000, start_date=20240901T224135, end_date=20240901T224215
+[2024-09-01T22:42:16.074+0000] {local_task_job_runner.py:261} INFO - Task exited with return code 0
+[2024-09-01T22:42:16.095+0000] {taskinstance.py:3891} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-09-01T22:42:16.100+0000] {local_task_job_runner.py:240} INFO - ::endgroup::
