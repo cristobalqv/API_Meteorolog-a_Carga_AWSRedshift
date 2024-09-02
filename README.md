@@ -8,7 +8,9 @@
 [![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)
 
 ### Actualización 01-09-2024 (Tercera pre-entrega):
+**__________________________________________________________________________**
 Corresponde al proceso de automatización del script. Se trabajó con Docker en conjunto con Airflow, donde se creó un [Dockerfile](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/Dockerfile "Dockerfile") para la creación de una imagen con Airflow y Python y las dependencias necesarias para su correcta ejecución en Docker. Además se genera un archivo [docker-compose.yml](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/docker-compose.yml "docker-compose.yml") en el que se configuran los diferentes servicios necesarios para el correcto funcionamiento del proceso en un entorno asilado de Docker. Posterior a esto, se genera un archivo [dag.py](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/dags/dag.py "dag") que se encarga de la llamada a un objeto de tipo PythonOperator, con una frecuencia de ejecución establecida. De esta forma, el proceso ETL es llamado por el dag y es ejecutado diaria y automáticamente.
+**__________________________________________________________________________**
 
 Consideraciones:
 - Para poder hacer la conexión entre Python y AWS Redshift se utilizó  SQLAlchemy.  Es una herramienta que puede ser utilizada de diferentes formas, en este caso como conexión directa entre Python y SQL en un DataWarehouse como AWS Redshift.
