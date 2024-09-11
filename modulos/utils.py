@@ -167,8 +167,14 @@ class RedshiftManager():
                 
                 #agregar 2 columnas temporales con fecha y hora de carga
                 self.crear_columnas_temporales(nombretabla)
-
                 print(f'Dataframe cargado con éxito en AWS Redshift')
+
+
+                # ÚLTIMA ENTREGA: genero un archivo plano que me servirá para que "task_envio_mail" pueda acceder a este y comprobar efectividad del proceso
+                with open ('/opt/airflow/logs/indicador_exito.txt', 'w') as f:
+                    f.write('success')
+
+
             except Exception as e:
                 print(f'Error al cargar dataframe a AWS Redshift: {e}')
         else:

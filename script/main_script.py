@@ -20,15 +20,16 @@ url_base = f'https://api.openweathermap.org/data/2.5/forecast?lat=-33.437&lon=-7
 
 
 #EJECUCIÓN
+if __name__=="__main__":
 
-conexion = ConexionAPIDescargaJSON(url_base)
-conexion.conectar_API_devolver_json()    #archivo sin parsear de la respuesta del servidor que se guarda en el objeto conexion.response_json
-conexion.convertir_json_a_dataframe()    #retornará self.df que será guardado en el atributo conexion.df
-df = conexion.procesar_dataframe()            
+    conexion = ConexionAPIDescargaJSON(url_base)
+    conexion.conectar_API_devolver_json()    #archivo sin parsear de la respuesta del servidor que se guarda en el objeto conexion.response_json
+    conexion.convertir_json_a_dataframe()    #retornará self.df que será guardado en el atributo conexion.df
+    df = conexion.procesar_dataframe()            
 
-redshift = RedshiftManager(credenciales_redshift, schema)
-redshift.crear_motor_conexion_redshift()
-redshift.actualizar_fechas_horas(df, 'meteorología_santiago_cl')
-redshift.cargar_datos_redshift(df, 'meteorología_santiago_cl')
-# redshift.modificar_columnas_crear_llave_compuesta('meteorología_santiago_cl')  #Esta parte del codigo la omitimos porque ya la llamamos, modificamos y creamos
-redshift.cerrar_conexion_redshift()
+    redshift = RedshiftManager(credenciales_redshift, schema)
+    redshift.crear_motor_conexion_redshift()
+    redshift.actualizar_fechas_horas(df, 'meteorología_santiago_cl')
+    redshift.cargar_datos_redshift(df, 'meteorología_santiago_cl')
+    # redshift.modificar_columnas_crear_llave_compuesta('meteorología_santiago_cl')  #Esta parte del codigo la omitimos porque ya la llamamos, modificamos y creamos
+    redshift.cerrar_conexion_redshift()
