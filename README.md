@@ -15,18 +15,18 @@ Finalmente se crea una nueva tarea "task_envio_email" que notifica al correo se�
 Las variables que hay que configurar manualmente y habilitar dentro del archivo "airflow.cfg" una vez ejecutado los contenedores son las siguientes:
 
 [core]
-executor = CeleryExecutor
+- executor = CeleryExecutor
 [celery]
-broker_url = redis://redis:6379/0
-result_backend = db+postgresql://airflow:airflow@postgres/airflow
+- broker_url = redis://redis:6379/0
+- result_backend = db+postgresql://airflow:airflow@postgres/airflow
 [smtp]
-smtp_host = smtp.gmail.com
-smtp_starttls = True
-smtp_ssl = False
-smtp_user = tu_email@gmail.com
-smtp_port = 587
-smtp_password = tu_contraseña_de_gmail
-smtp_mail_from = tu_email@gmail.com
+- smtp_host = smtp.gmail.com
+- smtp_starttls = True
+- smtp_ssl = False
+- smtp_user = tu_email@gmail.com
+- smtp_port = 587
+- smtp_password = tu_contraseña_de_gmail
+- smtp_mail_from = tu_email@gmail.com
 
 Si bien hay algunas variables que ya se han definido anteriormente (celery) estas no están habilitadas en airflow.cfg, por lo que dejarlas deshabilitadas puede llevar a errores de ejecución.
 
