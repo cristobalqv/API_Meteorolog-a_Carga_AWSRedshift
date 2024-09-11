@@ -14,12 +14,12 @@ Consiste en generar un script para alertar via correo sobre el estado actual del
 Finalmente se crea una nueva tarea "task_envio_email" que notifica al correo señalado el éxito o fallo en el proceso de ETL.
 Las variables que hay que configurar manualmente y habilitar dentro del archivo "airflow.cfg" una vez ejecutado los contenedores son las siguientes:
 
-[core]
+- [core]
 - executor = CeleryExecutor
-[celery]
+- [celery]
 - broker_url = redis://redis:6379/0
 - result_backend = db+postgresql://airflow:airflow@postgres/airflow
-[smtp]
+- [smtp]
 - smtp_host = smtp.gmail.com
 - smtp_starttls = True
 - smtp_ssl = False
