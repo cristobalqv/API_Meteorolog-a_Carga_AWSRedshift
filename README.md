@@ -30,7 +30,11 @@ Las variables que hay que configurar manualmente y habilitar dentro del archivo 
 
 Si bien hay algunas variables que ya se han definido anteriormente (celery) estas no están habilitadas en airflow.cfg, por lo que dejarlas deshabilitadas puede llevar a errores de ejecución.
 
+Ejecución del dag
+[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/ejecucion_dag.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/ejecucion_dag.png)
 
+Carga final de datos
+[![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/dbeaver.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/dbeaver.png)
 
 **__________________________________________________________________________**
 ### Actualización 01-09-2024 (Tercera pre-entrega):
