@@ -51,6 +51,8 @@ Consideraciones:
 Se utilizó el método anterior debido a su practicidad y simplicidad en la carga de datos a la nube.
 
 - Coordenadas: lat=-33.437   lon=-70.650  
+- *(estas coordenadas se pueden cambiar. Para esto se debe seguir el formato de grado decimal y con un límite de 3 cifras luego de la separación decimal. Además al modificarlas, se debe cambiar el nombre de la tabla por la nueva ciudad elegida, para que se cree una nueva tabla y no existan inconsistencias en la información. Seguir el formato "meteorologia_ciudad_codigopais"
+Ejemplo: "meteorologia_londres_ig")*
 
 - [Script principal](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/script/main_script.py "Script principal")
 

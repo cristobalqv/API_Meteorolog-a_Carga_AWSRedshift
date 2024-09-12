@@ -24,7 +24,8 @@ def ejecutar_etl():
           result = subprocess.run(['python3', '/app/script/main_script.py'], check=True)
           print("Proceso ETL ejecutado correctamente")
           
-          # Leer coordenadas desde el archivo generado en main.py
+          # Leer coordenadas desde el archivo generado en main.py para poder utilizarlas
+          # en nuestro task_envio_correo
           print('Extrayendo coordenadas. . .')
           with open('/opt/airflow/logs/coordenadas.txt', 'r') as f:
                coordenadas = f.read().strip().split(',')
