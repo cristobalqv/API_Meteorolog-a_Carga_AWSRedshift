@@ -21,21 +21,40 @@ password_gmail = os.getenv('password_gmail')
 
 def ejecutar_etl():
      try:
-        result = subprocess.run(['python3', '/app/script/main_script.py'], check=True)
-        print("Proceso ETL ejecutado correctamente")
+          result = subprocess.run(['python3', '/app/script/main_script.py'], check=True)
+          print("Proceso ETL ejecutado correctamente")
+          
+          # Leer coordenadas desde el archivo generado en main.py
+          print('Extrayendo coordenadas. . .')
+          with open('/opt/airflow/logs/coordenadas.txt', 'r') as f:
+               coordenadas = f.read().strip().split(',')
+               latitud = coordenadas[0]
+               longitud = coordenadas[1]
+               nombre_tabla = coordenadas[2]
+               print('Se extrajeron las coordenadas exitosamente')
+
+          # generamos un indicador para monitorear el proceso ETL
+          with open('/opt/airflow/logs/indicador_exito.txt', 'w') as f:
+               f.write('success')
+
+          return {'latitud': latitud, 'longitud': longitud, 'nombre_tabla': nombre_tabla}
+
      except subprocess.CalledProcessError as e:
-        print(f"Error en la ejecución del script ETL: {e}")
-        raise e
+          with open('/opt/airflow/logs/indicador_exito.txt', 'w') as f:
+               f.write('fail')
+          raise e
 
 
-#AGREGO FUNCION PARA SABER SI EL PROCESO FUE EXITOSO O NO
-def verificar_resultado():
+# Agrego funcion para saber si el proceso fue exitoso o no. Le paso de argumento "info_etl" el que se explica más abajo
+def verificar_resultado(info_etl):
      try:
           with open('/opt/airflow/logs/indicador_exito.txt', 'r') as f:
                status = f.read().strip()   #lee el archivo y elimina espacios para comparar posteriormente
 
                if status == 'success':
-                    return 'El proceso ETL fue exitoso. Sus datos han sido cargados a AWS Redshift'
+                    return f"""El proceso ETL fue exitoso.
+                           Los datos han sido cargados a AWS Redshift en la tabla: {info_etl['nombre_tabla']}.
+                           Se ha cambiado la latitud a {info_etl['latitud']} y la longitud a {info_etl['longitud']}."""
                else:
                     return 'El proceso ETL no se completó correctamente. Revise su código y vuelva a intentarlo nuevamente'
             
@@ -44,12 +63,18 @@ def verificar_resultado():
           return f'Archivo indicador_exito.txt no existe, no fue posible subir los datos a AWS Redshift. {e}'
      
 
-def enviar_mail():
+# Esta funcion será usada como "python_callable". Como cada task de un dag tiene asociado un contexto de ejecución, 
+# el task ejecutar_etl genera un diccionario de las coordenadas que se guardan automaticamente en XCom al ser parte
+# de la task_instance. Posteriormente el task_envio_mail hace un "pull" y permite acceder a estos valores
+def enviar_mail(**context):
      try:
+          info_etl = context['task_instance'].xcom_pull(task_ids='ejecutar_etl')
           subject = 'Notificación proceso ETL'
-          body_text = verificar_resultado()
+          body_text = verificar_resultado(info_etl)
 
-          msg = MIMEMultipart()   #objeto de tipo MIMEMultipart. Para crear y manejar correos que pueden contener diferentes partes (texto, imágenes, archivos adjuntos, etc.)
+          #objeto de tipo MIMEMultipart. Para crear y manejar correos que pueden contener diferentes partes 
+          # (texto, imágenes, archivos adjuntos, etc)
+          msg = MIMEMultipart()                                             
           msg['From'] = sender_email
           msg['To'] = sender_email
           msg['Subject'] = subject
@@ -71,6 +96,8 @@ default_args = {'owner': 'cristobalqv',
                 'retries': 5,
                 'retry_delay': timedelta(minutes=3)}
 
+
+
 with DAG(default_args=default_args,
          dag_id='etl_meterorologia',
          description='DAG para realizar proceso ETL. extracción desde API, transformación y carga a AWS',
@@ -86,6 +113,8 @@ with DAG(default_args=default_args,
 
      task_envio_mail = PythonOperator(
           task_id = 'envio_correo',
-          python_callable = enviar_mail)
+          python_callable = enviar_mail,
+          provide_context=True)
      
+
      task_ETL_DAG >> task_envio_mail

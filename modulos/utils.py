@@ -28,7 +28,6 @@ class ConexionAPIDescargaJSON():
             return 
         
 
-
     #Recibe un archivo JSON devuelto por la API y lo convierte en un dataframe de pandas.
     def convertir_json_a_dataframe(self):
         diccionario = {'fecha': [], 
@@ -75,7 +74,6 @@ class ConexionAPIDescargaJSON():
             raise ValueError("No hay archivo JSON para procesar aún")
     
 
-
     def procesar_dataframe(self):
         if self.df is not None:
             try:
@@ -96,6 +94,7 @@ class ConexionAPIDescargaJSON():
             print('No hay dataframe para procesar')
             return self.df
 
+
     
 
 #Clase para manejar conexión y carga a AWS Redshift
@@ -105,7 +104,6 @@ class RedshiftManager():
         self.schema = schema
         self.conexion = None
         
-
 
     #Se crea un engine que conecta a redshift medianate una url con formato: "dialect+driver://username:password@host:port/database"
     def crear_motor_conexion_redshift(self):
@@ -134,7 +132,6 @@ class RedshiftManager():
             print(f'Error al intentar crear el motor: {e}')  
 
 
-
     #SEGUNDA ENTREGA: Crear lista de claves primaria compuesta que involucre fecha y hora. Al no tener una clave primaria que 
     # identifique a un registro como único, generamos una clave primaria compuesta entre fecha y hora. Esto nos da 2 ventajas: 
     # identificar cada registro dentro del dataframe como único, y también nos da una guía para actualizar ciertos registros 
@@ -149,14 +146,13 @@ class RedshiftManager():
                 fechas_horas = dataframe[['fecha', 'hora']].values.tolist()  #Esto va a generar una lista de listas a partir 
                 # del dataframe que quiero insertar, y que contendrá la fecha y hora de los registros nuevos
                 for fecha, hora in fechas_horas:
-                    query_eliminar = f'''DELETE FROM {nombretabla} WHERE fecha = '{fecha}' AND hora = '{hora}';'''     #elimina 
-                    # cada registro de hora y fecha  creado antes del dataframe actual, para que pueda ser actualizado 
+                    query_eliminar = f'''DELETE FROM {nombretabla} WHERE fecha = '{fecha}' AND hora = '{hora}';'''     
+                    # elimina cada registro de hora y fecha  creado antes del dataframe actual, para que pueda ser actualizado 
                     # por los registros coincidentes del nuevo dataframe
                     self.conexion.execute(text(query_eliminar))
                 print('Se actualizó correctamente la información')
             except Exception as e:
                 print(f'Ocurrió un error al actualizar los registros de hora y fecha: {e}')
-
 
 
     #Carga del dataframe a AWS Redshift
@@ -166,14 +162,8 @@ class RedshiftManager():
                 tabla = dataframe.to_sql(nombretabla, con=self.conexion, schema=self.schema, if_exists='append', index=False)
                 
                 #agregar 2 columnas temporales con fecha y hora de carga
-                self.crear_columnas_temporales(nombretabla)
-                print(f'Dataframe cargado con éxito en AWS Redshift')
-
-
-                # ÚLTIMA ENTREGA: genero un archivo plano que me servirá para que "task_envio_mail" pueda acceder a este y comprobar efectividad del proceso
-                with open ('/opt/airflow/logs/indicador_exito.txt', 'w') as f:
-                    f.write('success')
-
+                self.crear_columnas_temporales(nombretabla)                  
+                print(f'Dataframe cargado con éxito en AWS Redshift') 
 
             except Exception as e:
                 print(f'Error al cargar dataframe a AWS Redshift: {e}')
@@ -224,8 +214,8 @@ class RedshiftManager():
                 print(f'Error durante la modificación de columnas y creación de clave primaria: {e}')
         else:
             print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión")
-
     
+
     #Crear columnas temporales
     def crear_columnas_temporales(self, nombretabla):
         if self.conexion is not None:
@@ -264,6 +254,62 @@ class RedshiftManager():
 
 
 
+
+    #verificar si tabla existe
+    def verificar_si_tabla_existe(self, nombretabla):
+        if self.conexion is not None:
+            query = f"""SELECT EXISTS 
+                        (SELECT 1 
+                        FROM information_schema.tables 
+                        WHERE table_schema = '{self.schema}' AND table_name = '{nombretabla}');"""
+            resultado = self.conexion.execute(text(query)).fetchone()
+            return resultado[0]   #Si la tabla existe va a retornar True. Si no existe, False
+
+
+    # crear nueva tabla en redshift
+    def crear_nueva_tabla(self, nombretabla: str):
+        if self.conexion is not None:
+            try:
+                query_creacion_tabla = f"""CREATE TABLE IF NOT EXISTS {self.schema}.{nombretabla} (
+                fecha DATE,
+                hora TIME,
+                temperatura FLOAT,
+                t_sensacion_termica FLOAT,
+                t_minima FLOAT,
+                t_maxima FLOAT,
+                condicion VARCHAR(256),
+                descripcion VARCHAR (256),
+                veloc_viento INT,
+                %_humedad INT,
+                probabilidad_precip FLOAT,
+                precip_ultimas_3h FLOAT,
+                fecha_carga DATE DEFAULT CURRENT_DATE NOT NULL,
+                hora_carga VARCHAR(8) DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') NOT NULL,
+                PRIMARY KEY (fecha, hora));"""
+
+                self.conexion.execute(text(query_creacion_tabla))
+                print('Nueva tabla creada con éxito en AWS Redshift')
+
+            except Exception as e:
+                print(f'Hubo un error al crear la tabla: {e}')
+
+
+    def cargar_nuevos_datos(self, dataframe, nombretabla):
+            if self.conexion is not None:
+                try: 
+                    tabla = dataframe.to_sql(nombretabla, con=self.conexion, schema=self.schema, if_exists='append', index=False)
+
+                    #agregar 2 columnas temporales con fecha y hora de carga
+                    self.crear_columnas_temporales(nombretabla)               
+                    print(f'Dataframe cargado con éxito en AWS Redshift')
+
+                except Exception as e:
+                    print(f'Error al cargar dataframe a AWS Redshift: {e}')
+            else:
+                print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión")
+
+
+
     #Cerrar conexión de AWS Redshift
     def cerrar_conexion_redshift(self):
         if self.conexion:
@@ -275,3 +321,4 @@ class RedshiftManager():
                 print(f'ocurrió un error al cerrar la conexión: {e}')
         else:
             print('No hay conexión abierta. Intenta abrir una conexión nueva')
+
