@@ -95,10 +95,11 @@ class ConexionAPIDescargaJSON():
             return self.df
 
 
-    
+
+
 
 #Clase para manejar conexión y carga a AWS Redshift
-class RedshiftManager():
+class RedshiftManager():    
     def __init__(self, credenciales: dict, schema: str):
         self.credenciales = credenciales
         self.schema = schema
@@ -140,7 +141,8 @@ class RedshiftManager():
     # extraídos en primera instancia. Así se pueden reemplazar adecuadamente los registros que presentan la misma fecha y 
     # hora al ejecutar el script.
 
-    def actualizar_fechas_horas(self, dataframe, nombretabla):
+    def actualizar_fechas_horas(self, dataframe, nombretabla):   #toma el dataframe, compara los registros con los de la tabla
+        # en la base de datos, y elimina aquellos de la base de datos que coinciden con los nuevos
         if self.conexion is not None:
             try:
                 fechas_horas = dataframe[['fecha', 'hora']].values.tolist()  #Esto va a generar una lista de listas a partir 
@@ -155,14 +157,16 @@ class RedshiftManager():
                 print(f'Ocurrió un error al actualizar los registros de hora y fecha: {e}')
 
 
-    #Carga del dataframe a AWS Redshift
-    def cargar_datos_redshift(self, dataframe, nombretabla):
+    def cargar_datos_redshift(self, dataframe, nombretabla):  
         if self.conexion is not None:
             try: 
                 tabla = dataframe.to_sql(nombretabla, con=self.conexion, schema=self.schema, if_exists='append', index=False)
                 
+
                 #agregar 2 columnas temporales con fecha y hora de carga
                 self.crear_columnas_temporales(nombretabla)                  
+
+
                 print(f'Dataframe cargado con éxito en AWS Redshift') 
 
             except Exception as e:
@@ -170,90 +174,9 @@ class RedshiftManager():
         else:
             print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión")
 
-    
-
-    # SEGUNDA ENTREGA: como la función de prueba anterior (borrada) me genera este error: "ALTER COLUMN SET NOT NULL is 
-    # not supported" al tratar de generar una llave compuesta, voy a crear 2 columnas nuevas que tengan restriccion not null 
-    # desde el inicio, copiar los datos desde las columnas fecha y hora antiguas a las nuevas y eliminar las columnas antiguas. 
-    # Esto trae un inconveniente en como se distribuye y observa la tabla finalmente, ya que estas columnas son creadas 
-    # por defecto al final de la tabla. 
-    # Postgresql no tiene una opción para cambiar el orden en que se muestran las columnas en la tabla, por lo que para 
-    # poder corregir la disposición de las columnas fecha y hora es necesario crear una nueva tabla con las columnas en 
-    # el orden deseado, copiar los datos de la tabla original a la nueva, eliminar la tabla original si es necesario y 
-    # renombrar la nueva tabla. Se opta por no modificar el nuevo orden de la tabla, con las columnas de pronóstico fecha 
-    # y hora en el sector derecho de la tabla.    
-
-    def modificar_columnas_crear_llave_compuesta(self, nombretabla):    #YA QUE REDSHIFT NO PERMITE MODIFICAR COLUMNAS 
-                                                                        # A NOT NULL SI YA ESTAN CREADAS
-        if self.conexion is not None:
-            try:
-                #crear nuevas columnas con not null
-                self.conexion.execute(text(f"ALTER TABLE {nombretabla} ADD COLUMN fecha_nueva DATE NOT NULL DEFAULT CURRENT_DATE;"))
-                self.conexion.execute(text(f"ALTER TABLE {nombretabla} ADD COLUMN hora_nueva TIME NOT NULL DEFAULT CURRENT_TIME;"))
-                print("columnas 'fecha_nueva' y 'hora_nueva' añadidas")
-
-                #copiar los datos desde las columnas originales
-                self.conexion.execute(text(f"UPDATE {nombretabla} SET fecha_nueva = fecha, hora_nueva = hora;"))
-                print("Datos copiados a las nuevas columnas")
-
-                #eliminar las columnas originales
-                self.conexion.execute(text(f"ALTER TABLE {nombretabla} DROP COLUMN fecha;"))
-                self.conexion.execute(text(f"ALTER TABLE {nombretabla} DROP COLUMN hora;"))
-                print("Columnas originales 'fecha' y 'hora' eliminadas")
-
-                #renombrar las nuevas columnas
-                self.conexion.execute(text(f"ALTER TABLE {nombretabla} RENAME COLUMN fecha_nueva TO fecha;"))
-                self.conexion.execute(text(f"ALTER TABLE {nombretabla} RENAME COLUMN hora_nueva TO hora;"))
-                print("Nuevas columnas renombradas a 'fecha' y 'hora'")
-
-                 #crear la clave primaria compuesta
-                clave_primaria_query = f'''ALTER TABLE {nombretabla} ADD CONSTRAINT pk_fecha_hora PRIMARY KEY (fecha, hora);'''
-                self.conexion.execute(text(clave_primaria_query))
-                print(f"Clave primaria compuesta creada en la tabla {nombretabla}")
-            except Exception as e:
-                print(f'Error durante la modificación de columnas y creación de clave primaria: {e}')
-        else:
-            print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión")
-    
-
-    #Crear columnas temporales
-    def crear_columnas_temporales(self, nombretabla):
-        if self.conexion is not None:
-            try:
-                #verificamos si la columna fecha_carga existe:
-                chequear_columna_fecha_carga = f'''SELECT column_name FROM information_schema.columns
-                                                   WHERE table_name = '{nombretabla}' AND column_name = 'fecha_carga';'''
-                resultado = self.conexion.execute(text(chequear_columna_fecha_carga)).fetchone()
-                if not resultado:
-                    #columna temporal para fecha
-                    alter_table_date_query = f'''ALTER TABLE {nombretabla} ADD COLUMN fecha_carga DATE DEFAULT CURRENT_DATE;'''
-                    self.conexion.execute(text(alter_table_date_query))
-                    print('columna fecha_carga añadida')
-                else:
-                    print('columna fecha_carga ya existe')                  
-            except Exception as e:
-                print(f'Ocurrió un error al confirmar existencia de columna:')
-
-            try:
-                #verificamos si la columna hora_carga existe:
-                chequear_columna_hora_carga = f'''SELECT column_name FROM information_schema.columns
-                                                   WHERE table_name = '{nombretabla}' AND column_name = 'hora_carga';'''
-                resultado2 = self.conexion.execute(text(chequear_columna_hora_carga)).fetchone()
-                if not resultado2:
-                    #columna temporal para hora
-                    alter_table_time_query = f"""ALTER TABLE {nombretabla} ADD COLUMN hora_carga VARCHAR(8) 
-                                                DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS')    NOT NULL;"""
-                    self.conexion.execute(text(alter_table_time_query))
-                    print('columna hora_carga añadida')
-                else:
-                    print('columna hora_carga ya existe')
-            except Exception as e:
-                    print(f'Error al añadir columnas temporales: {e}')
-        else:
-            print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión") 
 
 
-
+    #Debemos gestionar la lógica para cuando agregamos una nueva ciudad, por lo tanto una nueva tabla
 
     #verificar si tabla existe
     def verificar_si_tabla_existe(self, nombretabla):
@@ -300,14 +223,13 @@ class RedshiftManager():
                     tabla = dataframe.to_sql(nombretabla, con=self.conexion, schema=self.schema, if_exists='append', index=False)
 
                     #agregar 2 columnas temporales con fecha y hora de carga
-                    self.crear_columnas_temporales(nombretabla)               
+                    # self.crear_columnas_temporales(nombretabla)               
                     print(f'Dataframe cargado con éxito en AWS Redshift')
 
                 except Exception as e:
                     print(f'Error al cargar dataframe a AWS Redshift: {e}')
             else:
                 print("No hay conexión creada con AWS Redshift. Intenta establecer una conexión")
-
 
 
     #Cerrar conexión de AWS Redshift

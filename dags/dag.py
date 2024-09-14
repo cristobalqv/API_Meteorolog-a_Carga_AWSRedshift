@@ -93,10 +93,11 @@ def enviar_mail(**context):
           
 
 
+
+
 default_args = {'owner': 'cristobalqv',
                 'retries': 5,
                 'retry_delay': timedelta(minutes=3)}
-
 
 
 with DAG(default_args=default_args,
