@@ -7,17 +7,20 @@
 
 [![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)
 
-------------
 
+------------
 ## Funcionamiento del proyecto
 *1. Extracción de datos*
 Se extraen datos correspondientes a una serie de variables meteorológicas desde la API [Openweathermap](https://openweathermap.org/ "Openweathermap") y estos son almacenados en un objeto de tipo dataframe de pandas.
 
-2. Transformación de datos:
+
+*2. Transformación de datos*
 Estos datos son procesados y transformados para su posterior carga a AWS Redshift. Específicamente, se procesan las columnas para modificar los tipos de datos a un formato compatible con Postgresql, en conjunto con creación de columnas de monitoreo (temporales) y creación de llave primaria compuesta.
 
-3. Carga de datos:
+
+*3. Carga de datos*
 Por último se verifica la existencia de la tabla (en caso de añadir una ciudad diferente a la predeterminada), se realiza una actualización de los datos para no generar información duplicada y se carga la información a AWS Redshift.
+
 
 - Todo este proceso es orquestado mediante `Docker` y `Apache Airflow`. Docker nos permite trabajar con contenedores dentro de un entorno aislado, los cuales se pueden comunicar entre sí gracias a que forman parte de una red común, mientras que Airflow nos facilita ciertos servicios que facilitan tanto la visualización del estado de nuestro proceso ETL como la automatización del mismo
 
