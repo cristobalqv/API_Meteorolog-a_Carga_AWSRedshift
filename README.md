@@ -8,7 +8,6 @@
 [![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/santiago.png)
 
 
-------------
 ## Funcionamiento del proyecto
 *1. Extracción de datos:*
 Se extraen datos correspondientes a una serie de variables meteorológicas desde la API [Openweathermap](https://openweathermap.org/ "Openweathermap") y estos son almacenados en un objeto de tipo dataframe de pandas.
@@ -35,7 +34,7 @@ Este repositorio está compuesto por 4 carpetas principales que contienen los ar
 [`modulos/`](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/tree/main/modulos "`modulos/`")
 - Contiene el archivo [utils.py](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/modulos/utils.py "utils.py"), el que contiene las clases (y sus respectivos métodos y atributos) que van a ser llamados desde el script exterior *main_script.py* para poder ejecutar el proceso ETL. Por otro lado, el archivo [__init__.py](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/tree/main/modulos "__init__.py") no contiene información pero debe existir por defecto en la carpeta, para que scripts externos puedan acceder e interactuar con las clases y funciones presentes en *utils.py*. 
 
-[`main/`](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/tree/main/main "`main/`")
+[`script`](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/tree/main/script "`script`")
 - En esta carpeta el archivo [main_script.py](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/script/main_script.py "main_script.py") es de donde se realiza el llamado a crear y ejecutar el código interno de *utils.py* correspondiente al proceso ETL. 
 
 [`varios/`](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/tree/main/varios "`varios/`")
@@ -47,7 +46,7 @@ Este repositorio está compuesto por 4 carpetas principales que contienen los ar
 - [`requirements.txt`](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/requirements.txt "`requirements.txt`"): Contiene las dependencias que serán utilizadas por los archivos de Python dentro del ambiente aislado de contenedores de Docker. 
 - [`.gitignore`](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/.gitignore "`.gitignore`"): Contiene variables secretas que deben ser ignoradas al cargarlas al repositorio
 
-------------
+
 
 ### Actualización 14-09-2024 (Entrega final):
 
@@ -86,15 +85,14 @@ Carga final de datos
 Notificación de correo
 [![](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/correo.png)](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/varios/correo.png)
 
-------------
+
 
 ### Actualización 01-09-2024 (Tercera pre-entrega):
 
 Corresponde al proceso de automatización del script de ETL. Se trabajó con Docker en conjunto con Airflow, donde se creó un [Dockerfile](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/Dockerfile "Dockerfile") para la creación de una imagen con Airflow y Python y las dependencias necesarias para su correcta ejecución en Docker. Además se genera un archivo [docker-compose.yml](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/docker-compose.yml "docker-compose.yml") en el que se configuran los diferentes servicios necesarios para el funcionamiento del proceso en un entorno aislado de Docker. Posterior a esto, se genera un archivo [dag.py](https://github.com/cristobalqv/API_Meteorolog-a_Carga_AWSRedshift/blob/main/dags/dag.py "dag") que se encarga de la llamada a un objeto de tipo PythonOperator, con una frecuencia de ejecución establecida. De esta forma, el proceso ETL es llamado por el dag y es ejecutado de manera diaria y automática.
 
-------------
 
-Consideraciones:
+### Consideraciones:
 - Para poder hacer la conexión entre Python y AWS Redshift se utilizó  SQLAlchemy.  Es una herramienta que puede ser utilizada de diferentes formas, en este caso como conexión directa entre Python y SQL en un DataWarehouse como AWS Redshift.
 Se utilizó el método anterior debido a su practicidad y simplicidad en la carga de datos a la nube.
 
